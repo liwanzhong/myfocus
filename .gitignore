@@ -1,0 +1,9 @@
+# 忽略 HBuilderX 配置目录
+.hbuilderx/
+
+# 忽略 Node.js 依赖目录
+node_modules/
+
+# 保留其他原有的忽略规则
+unpackage/
+.cursorrules
