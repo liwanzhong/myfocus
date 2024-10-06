@@ -1,0 +1,624 @@
+* {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+$primary-color: #d95550;
+$white: #fff;
+$light-gray: #ddd;
+$dark-gray: #999;
+$border-radius: 10px;
+$padding: 20px;
+
+/* 全局样式 */
+:root {
+  --bg-color: v-bind('bgColor');
+}
+
+html,
+body,
+#app,
+.page-wrapper,
+.content-container {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+
+
+// 页面布局
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.safe-area-inset-left,
+.safe-area-inset-right {
+  flex-shrink: 0;
+}
+
+.content-container {
+  width: 100%;
+  max-width: 750px; // 设置最大宽度
+  padding: 0 20px; // 添加左右内边距
+  box-sizing: border-box;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (min-width: 768px) {
+    padding: 0 40px; // 在大屏幕上增加内边距
+  }
+}
+
+// 混合
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin card {
+  background-color: $white;
+  border-radius: $border-radius;
+  padding: $padding;
+}
+
+// 容器样式
+
+.container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+  padding-top: calc(var(--status-bar-height) + 44px);
+  box-sizing: border-box;
+  background-color: transparent;
+
+  @media screen and (min-width: 768px) {
+    padding-top: calc(var(--status-bar-height) + 60px);
+  }
+}
+
+
+// 大屏幕布局调整
+@media screen and (min-width: 768px) {
+
+  .timer-container,
+  .tasks-container {
+    padding: 40px;
+  }
+
+  .timer {
+    font-size: 100px;
+  }
+
+  .button-row {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .session-info {
+    font-size: 24px;
+  }
+
+  .task-item {
+    padding: 20px;
+  }
+}
+
+
+
+// 计时器容器
+.timer-container {
+  background-color: rgba($white, 0.1);
+  border-radius: $border-radius;
+  padding: 40rpx;
+  margin-bottom: 40rpx;
+
+  .timer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20rpx;
+
+    .icon-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    
+    .icon-wrapper {
+      margin-left: 30px;
+    }
+    
+    .icon-wrapper:first-child {
+      margin-left: 0;
+    }
+    
+    .contact-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      line-height: 1;
+    }
+    
+    /* 微信小程序特定样式 */
+    /* #ifdef MP-WEIXIN */
+    .icon-wrapper {
+      margin-left: 20px; /* 为微信小程序环境减小间距 */
+    }
+    
+    .contact-button::after {
+      border: none;
+    }
+    /* #endif */
+
+    .fullscreen-icon,
+    .info-icon {
+      margin-left: 10px;
+    }
+
+    .u-tabs {
+      flex: 1;
+    }
+
+    .fullscreen-icon {
+      margin-left: 20rpx;
+    }
+  }
+
+  .timer {
+    @include flex-center;
+    margin: 60rpx 0;
+
+    .time {
+      font-size: 180rpx;
+      color: $white;
+      font-weight: bold;
+    }
+  }
+
+  .session-info {
+    text-align: center;
+    margin-top: 20rpx;
+    color: $white;
+    cursor: pointer;
+  }
+}
+
+// 任务容器
+.tasks-container {
+  @include card;
+  margin-top: 20px;
+  flex: 0 1 auto;
+  min-height: 200rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+  background-color: $white;
+  margin-bottom: 20px; // 添加底部边距
+  padding: 20px;
+  border-radius: 20px; // 统一圆角
+}
+
+
+// 任务头部
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid $light-gray;
+}
+
+.tasks-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+// 任务项
+.task-item {
+  background-color: #fff9dc;
+  border-radius: $border-radius / 2;
+  padding: $padding / 2;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
+
+  &.dragging {
+    opacity: 0.7;
+    transform: scale(1.05);
+    z-index: 1;
+  }
+
+  &.completed {
+    opacity: 0.6;
+  }
+
+  .completed-text {
+    text-decoration: line-through;
+  }
+
+  .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .task-title {
+    flex: 1;
+    margin-left: 10px;
+    font-weight: bold;
+  }
+
+  .task-count {
+    margin-right: 10px;
+    color: $dark-gray;
+  }
+
+  .task-note {
+    margin-top: 5px;
+    font-size: 14px;
+    color: $dark-gray;
+  }
+}
+
+
+// 添加任务按钮
+.add-task {
+  @include flex-center;
+  padding: $padding / 2;
+  border: 2px dashed $light-gray;
+  border-radius: $border-radius / 2;
+  color: $dark-gray;
+  transition: all 0.3s ease;
+  margin-top: 20rpx;
+
+  &:active {
+    background-color: $light-gray;
+  }
+}
+
+
+.add-task-modal {
+  width: 80vw;
+  max-width: 600rpx;
+  padding: 30rpx;
+  box-sizing: border-box;
+  position: relative;
+  padding-bottom: 100rpx;
+  background-color: #ffffff;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  }
+
+  .task-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
+
+  .est-pomodoros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .pomodoro-counter {
+      display: flex;
+      align-items: center;
+
+      input {
+        width: 40px;
+        text-align: center;
+        margin: 0 10px;
+      }
+    }
+  }
+
+  .add-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    color: #999;
+  }
+
+  .modal-footer {
+    position: absolute;
+    bottom: 20rpx;
+    left: 20rpx;
+    right: 20rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left-button {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+
+      .delete-button {
+        color: #666;
+        background-color: transparent;
+        border: none;
+        padding-left: 0;
+      }
+    }
+
+    .right-buttons {
+      display: flex;
+      gap: 20rpx;
+      margin-left: auto;
+
+      .cancel-button {
+        color: #666;
+        background-color: transparent;
+        border: none;
+      }
+    }
+  }
+}
+
+
+// 按钮样式
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20rpx;
+}
+
+.custom-button {
+  background-color: #4A4A4A !important;
+  color: #ffffff !important;
+}
+
+
+// 导航栏样式
+.navbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  background-color: var(--bg-color);
+}
+
+:deep(.u-navbar) {
+  width: 100%;
+  max-width: 750px;
+  background-color: transparent !important;
+
+  .u-navbar__content {
+    padding-left: 20px;
+    padding-right: 20px;
+
+    @media screen and (min-width: 768px) {
+      padding-left: 40px;
+      padding-right: 40px;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    height: 60px !important;
+
+    .u-navbar__content__title {
+      font-size: 24px !important;
+    }
+  }
+}
+
+
+
+.fullscreen-focus {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #fff;
+  background-color: var(--bg-color);
+  position: relative;
+  width: 100%;
+
+  .custom-close-icon {
+    position: absolute;
+    top: 50px;
+    right: 15px;
+    z-index: 1;
+  }
+
+  @media screen and (min-width: 768px) {
+    .focus-time {
+      font-size: 180px !important;
+    }
+
+    .focus-task-name {
+      font-size: 32px !important;
+    }
+
+    .focus-session-count {
+      font-size: 24px !important;
+    }
+
+    .focus-buttons {
+      margin-top: 40px;
+    }
+  }
+
+  .focus-timer {
+    margin-bottom: 40rpx;
+
+    .focus-time {
+      font-size: 35vw;
+      font-weight: bold;
+    }
+  }
+
+  .focus-task-info {
+    text-align: center;
+    margin-bottom: 40rpx;
+
+    .focus-task-name {
+      font-size: 36rpx;
+      margin-bottom: 10rpx;
+      display: block;
+    }
+
+    .focus-session-count {
+      font-size: 28rpx;
+      opacity: 0.8;
+    }
+  }
+
+  .focus-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60rpx; // 增加顶部边距
+
+    ::v-deep .u-button {
+      margin: 0 20rpx; // 增加按钮之间的间距
+
+      &::after {
+        border: none;
+      }
+    }
+  }
+}
+
+.timer-status-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba($white, 0.1);
+  border-radius: $border-radius;
+  margin-top: 20px;
+}
+
+
+.no-tasks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx; // 设置一个合适的高度
+  color: $dark-gray;
+  font-size: 28rpx;
+}
+
+
+.best-practices-guide {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .guide-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .guide-content {
+    flex: 1;
+    overflow-y: auto;
+
+    .guide-section {
+      margin-bottom: 20px;
+
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      text {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+// 自定义滚动条样式（仅适用于支持的浏览器）
+.guide-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.guide-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.guide-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.guide-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.disclaimer-section {
+  margin-top: 40rpx;
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.disclaimer-header {
+  margin-bottom: 20rpx;
+}
+
+.disclaimer-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.disclaimer-content {
+  text {
+    display: block;
+    font-size: 24rpx;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 16rpx;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
