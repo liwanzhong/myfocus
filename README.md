@@ -5,11 +5,15 @@
 番茄钟时间管理工具是一款帮助用户提高工作和学习效率的应用。通过科学的专注与休息循环，让用户轻松达成目标。简洁的界面设计使其易于上手，是学生和职场人士提高效率的得力助手。
 
 ## 产品截图
-![主界面截图](.github/首页.jpg)
-![短休息界面截图](.github/短休息.jpg)
-![长休息截图](.github/长休息.jpg)
-![专注界面截图](.github/专注页.jpg)
-![一个番茄钟完成界面截图](.github/番茄钟完成.jpg)
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+  <img src=".github/首页.jpg" alt="主界面截图" width="30%">
+  <img src=".github/短休息.jpg" alt="短休息界面截图" width="30%">
+  <img src=".github/长休息.jpg" alt="长休息截图" width="30%">
+</div>
+<div style="display: flex; justify-content: flex-start; flex-wrap: wrap; margin-top: 10px;">
+  <img src=".github/专注页.jpg" alt="专注界面截图" width="30%">
+  <img src=".github/番茄钟完成.jpg" alt="一个番茄钟完成界面截图" width="30%">
+</div>
 
 ## 主要功能
 
@@ -24,7 +28,7 @@
 
 ### 小程序版
 
-![小程序二维码](.github/小程序码二维码.jpg)
+![小程序二维码](.github/小程序二维码.jpg)
 
 ### pc版
 
@@ -39,7 +43,7 @@
 - UI 框架：uview
 - 开发语言：Vue.js
 
-## 快速开发
+## 快速运行
 
 
 1. 克隆仓库
