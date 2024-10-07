@@ -5,28 +5,24 @@
 番茄钟时间管理工具是一款帮助用户提高工作和学习效率的应用。通过科学的专注与休息循环，让用户轻松达成目标。简洁的界面设计使其易于上手，是学生和职场人士提高效率的得力助手。
 
 ## 产品截图
-<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-  <div style="width: 45%; text-align: center;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+  <div style="width: 48%; text-align: center; margin-bottom: 20px;">
     <img src=".github/首页.jpg" alt="主界面截图" width="100%">
     <p>主界面截图</p>
   </div>
-  <div style="width: 45%; text-align: center;">
+  <div style="width: 48%; text-align: center; margin-bottom: 20px;">
     <img src=".github/短休息.jpg" alt="短休息界面截图" width="100%">
     <p>短休息界面截图</p>
   </div>
-</div>
-<div style="display: flex; justify-content: space-between; flex-wrap: wrap; margin-top: 20px;">
-  <div style="width: 45%; text-align: center;">
+  <div style="width: 48%; text-align: center; margin-bottom: 20px;">
     <img src=".github/长休息.jpg" alt="长休息截图" width="100%">
     <p>长休息截图</p>
   </div>
-  <div style="width: 45%; text-align: center;">
+  <div style="width: 48%; text-align: center; margin-bottom: 20px;">
     <img src=".github/专注页.jpg" alt="专注界面截图" width="100%">
     <p>专注界面截图</p>
   </div>
-</div>
-<div style="display: flex; justify-content: flex-start; flex-wrap: wrap; margin-top: 20px;">
-  <div style="width: 45%; text-align: center;">
+  <div style="width: 48%; text-align: center;">
     <img src=".github/番茄钟完成.jpg" alt="一个番茄钟完成界面截图" width="100%">
     <p>一个番茄钟完成界面截图</p>
   </div>
