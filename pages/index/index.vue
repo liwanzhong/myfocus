@@ -2,7 +2,7 @@
   <view class="page-wrapper" :style="{ backgroundColor: bgColor }">
     <view class="content-container">
       <view class="navbar-wrapper">
-        <u-navbar :bgColor="bgColor" title="一个番茄" titleStyle="color: #fff; font-weight: bold;" :safeAreaInsetTop="true"
+        <u-navbar :bgColor="bgColor" title="myfocus" titleStyle="color: #fff; font-weight: bold;" :safeAreaInsetTop="true"
           fixed :placeholder="true">
           <view class="u-nav-slot" slot="left"></view>
           <view class="u-nav-slot" slot="right">
