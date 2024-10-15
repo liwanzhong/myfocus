@@ -2,14 +2,14 @@
   <view class="page-wrapper" :style="{ backgroundColor: bgColor }">
     <view class="content-container">
       <view class="navbar-wrapper">
-        <u-navbar :bgColor="bgColor" title="myfocus" titleStyle="color: #fff; font-weight: bold;" :safeAreaInsetTop="true"
-          fixed :placeholder="true">
+        <u-navbar :bgColor="bgColor" title="myfocus" titleStyle="color: #fff; font-weight: bold;"
+          :safeAreaInsetTop="true" fixed :placeholder="true">
           <view class="u-nav-slot" slot="left"></view>
           <view class="u-nav-slot" slot="right">
           </view>
         </u-navbar>
       </view>
-      
+
       <view class="container" :style="{ backgroundColor: bgColor }">
         <view class="timer-container">
           <view class="timer-header">
@@ -39,7 +39,7 @@
           </view>
 
           <view class="button-row">
-            <u-button :text="timerRunning ? '暂  停' : '开  始'" @click="toggleTimer" :customStyle="{
+            <u-button :text="timerRunning ? '暂  停' : '开  始'" @click="handleTimerToggle" :customStyle="{
               backgroundColor: '#ffffff',
               color: bgColor,
               marginRight: '20rpx',
@@ -91,7 +91,7 @@
                 </u-checkbox-group>
                 <text class="task-title" :class="{ 'completed-text': task.completed }">{{ task.title }}</text>
                 <text class="task-count">{{ task.completedCount }}/{{ task.totalCount }}</text>
-                <u-icon name="more-dot-fill" color="#999" size="25" @tap="onMoreIconTap(index, $event)"></u-icon>
+                <u-icon name="more-dot-fill" color="#999" size="25" @tap.native.stop="showTaskOptions(index)"></u-icon>
               </view>
               <view v-if="task.note" class="task-note">
                 {{ task.note }}
@@ -161,7 +161,7 @@
               <text class="focus-task-name">{{ currentSessionMessage }}</text>
             </view>
             <view class="focus-buttons">
-              <u-button :text="timerRunning ? '暂  停' : '开  始'" @click="toggleTimer" :customStyle="{
+              <u-button :text="timerRunning ? '暂  停' : '开  始'" @click="handleTimerToggle" :customStyle="{
                 backgroundColor: '#fff',
                 color: bgColor,
                 fontSize: '40rpx',
@@ -179,6 +179,23 @@
                 border: 'none',
                 minWidth: '200rpx'
               }"></u-button>
+            </view>
+          </view>
+        </u-popup>
+
+        <!-- 暂停原因输入弹窗 (保持在全屏弹窗之外) -->
+        <u-popup :show="showPauseReasonModal" mode="center" :closeable="false" @close="closePauseReasonModal"
+          :customStyle="{ borderRadius: '20rpx', overflow: 'hidden' }">
+          <view class="pause-reason-modal">
+            <view class="modal-header">
+              <text class="modal-title">暂停原因</text>
+            </view>
+            <input class="reason-input" v-model="pauseReason" placeholder="请输入暂停原因（选填）" />
+            <view class="modal-footer">
+              <u-button text="取消" @click="closePauseReasonModal" type="info" shape="circle" size="medium"
+                style="margin-right: 20rpx; background-color: #ffffff !important;" plain></u-button>
+              <u-button text="记录" @click="recordPauseReason" shape="circle" size="medium"
+                style="background-color: #ffffff !important;" plain></u-button>
             </view>
           </view>
         </u-popup>
@@ -276,6 +293,79 @@
     </u-popup>
 
     <view class="safe-area-inset-right" :style="{ backgroundColor: bgColor }"></view>
+
+    <!-- 暂停原因输入弹窗 -->
+    <u-popup :show="showPauseReasonModal" mode="center" :closeable="false" @close="closePauseReasonModal"
+      :customStyle="{ borderRadius: '20rpx', overflow: 'hidden' }">
+      <view class="pause-reason-modal">
+        <view class="modal-header">
+          <text class="modal-title">暂停原因</text>
+        </view>
+        <input class="reason-input" v-model="pauseReason" placeholder="请输入暂停原因（选填）" />
+        <view class="modal-footer">
+          <u-button text="取消" @click="closePauseReasonModal" type="info" shape="circle" size="medium"
+            :customStyle="{ marginRight: '20rpx' }"></u-button>
+          <u-button text="记录" @click="recordPauseReason" type="primary" shape="circle" size="medium"></u-button>
+        </view>
+      </view>
+    </u-popup>
+
+    <!-- 在任务列表项中修改更多图标部分 -->
+    <u-picker :show="showTaskActionSheet" :columns="[taskActions]" @confirm="handleTaskAction"
+      @cancel="showTaskActionSheet = false" :closeOnClickOverlay="true" @close="showTaskActionSheet = false"></u-picker>
+    <!-- 添加打扰历史弹窗 -->
+    <u-popup :show="showDisturbanceHistory" mode="center" :closeable="true" @close="closeDisturbanceHistory"
+      :customStyle="{ borderRadius: '20rpx', overflow: 'hidden', width: '80%', maxWidth: '600rpx' }">
+      <view class="disturbance-history-modal">
+        <view class="modal-header">
+          <text class="modal-title">打扰历史</text>
+        </view>
+        <scroll-view scroll-y class="history-list">
+          <view v-for="(item, index) in currentTaskDisturbanceHistory" :key="index" class="history-item"
+            style="display: flex; flex-direction: column; align-items: flex-start;">
+            <text class="history-reason" style="margin-bottom: 5rpx; text-align: left; flex-grow: 1;">{{ item.reason
+              }}</text>
+            <text class="history-time" style="margin-bottom: 10rpx; text-align: left; color: #999;">{{
+              formatDate(item.timestamp) }}</text>
+
+            <view style="display: flex; justify-content: flex-end;">
+
+              <u-button text="删除" @click="deleteDisturbanceHistory(index)" :customStyle="{
+
+                backgroundColor: '#ffffff',
+
+                color: '#ff4d4f',
+
+                border: 'none',
+
+                borderRadius: '10rpx',
+
+                fontSize: '20rpx',
+                padding: '6rpx 12rpx',
+
+                marginRight: '5rpx'
+
+              }"></u-button>
+              <u-button text="转为任务" @click="convertToTask(item)" :customStyle="{
+                backgroundColor: '#ffffff',
+
+                color: '#1890ff',
+
+                border: 'none',
+
+                borderRadius: '10rpx',
+                fontSize: '20rpx',
+                padding: '6rpx 12rpx'
+              }"></u-button>
+            </view>
+
+          </view>
+        </scroll-view>
+        <view v-if="currentTaskDisturbanceHistory.length === 0" class="no-history">
+          <text>暂无打扰记录</text>
+        </view>
+      </view>
+    </u-popup>
 
   </view>
 

@@ -138,15 +138,15 @@ body,
       align-items: center;
       justify-content: flex-end;
     }
-    
+
     .icon-wrapper {
       margin-left: 30px;
     }
-    
+
     .icon-wrapper:first-child {
       margin-left: 0;
     }
-    
+
     .contact-button {
       background: none;
       border: none;
@@ -154,16 +154,18 @@ body,
       margin: 0;
       line-height: 1;
     }
-    
+
     /* 微信小程序特定样式 */
     /* #ifdef MP-WEIXIN */
     .icon-wrapper {
-      margin-left: 20px; /* 为微信小程序环境减小间距 */
+      margin-left: 20px;
+      /* 为微信小程序环境减小间距 */
     }
-    
+
     .contact-button::after {
       border: none;
     }
+
     /* #endif */
 
     .fullscreen-icon,
@@ -188,6 +190,7 @@ body,
       font-size: 180rpx;
       color: $white;
       font-weight: bold;
+      font-family: monospace; // 使用等宽字体
     }
   }
 
@@ -478,6 +481,7 @@ body,
     .focus-time {
       font-size: 35vw;
       font-weight: bold;
+      font-family: monospace; // 使用等宽字体
     }
   }
 
@@ -616,9 +620,92 @@ body,
     color: #666;
     line-height: 1.6;
     margin-bottom: 16rpx;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
+  }
+}
+
+.pause-reason-modal {
+  width: 80vw;
+  max-width: 600rpx;
+  padding: 30rpx;
+  box-sizing: border-box;
+  background-color: #ffffff;
+
+  .modal-header {
+    margin-bottom: 20rpx;
+
+    .modal-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #333;
+    }
+  }
+
+  .reason-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    padding: 20rpx 0;
+    margin-bottom: 30rpx;
+    font-size: 28rpx;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  ::v-deep .modal-footer .u-button {
+    background-color: #ffffff !important;
+    border: none !important;
+    color: #000 !important;
+    /* 设置文本颜色 */
+  }
+}
+
+.disturbance-history-modal {
+  padding: 30rpx;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+
+  .modal-header {
+    margin-bottom: 20rpx;
+
+    .modal-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #333;
+    }
+  }
+
+  .history-list {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    padding: 10rpx 0;
+    border-bottom: 1px solid #eee;
+
+    .history-time {
+      font-size: 24rpx;
+      color: #999;
+    }
+
+    .history-reason {
+      font-size: 28rpx;
+      color: #333;
+      margin-top: 5rpx;
+    }
+  }
+
+  .no-history {
+    text-align: center;
+    color: #999;
+    padding: 40rpx 0;
   }
 }

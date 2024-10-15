@@ -53,6 +53,17 @@ export default {
             notificationAudio: null,
             showFullscreenFocus: false,
             showBestPracticesGuide: false,
+            showPauseReasonModal: false,
+            pauseReason: '',
+            pauseHistory: [],
+            showTaskActionSheet: false,
+            taskActions: [
+                { text: '编辑', value: 'edit_task' },
+                { text: '打扰历史', value: 'dump_list' }
+            ],
+            currentEditingTaskIndex: null,
+            showDisturbanceHistory: false,
+            currentTaskDisturbanceHistory: [],
 
         }
     },
@@ -260,7 +271,7 @@ export default {
                 this.stopBackgroundMusic();
             }
         },
-        toggleTimer() {
+        handleTimerToggle() {
             if (this.timerRunning) {
                 clearInterval(this.timer);
                 this.timerRunning = false;
@@ -271,6 +282,25 @@ export default {
                 uni.setKeepScreenOn({
                     keepScreenOn: false
                 });
+                this.showPauseReasonModal = true;
+            } else {
+                this.toggleTimer();
+            }
+        },
+
+        toggleTimer() {
+            if (this.timerRunning) {
+                clearInterval(this.timer);
+                this.timerRunning = false;
+                if (this.currentTab === 0) { // 专注状态
+                    this.pauseBackgroundMusic();
+                }
+                // 检查是否支持 setKeepScreenOn
+            if (typeof uni.setKeepScreenOn === 'function') {
+                uni.setKeepScreenOn({
+                    keepScreenOn: false
+                });
+            }
             } else {
                 this.setCurrentTask();
                 this.timer = setInterval(() => {
@@ -286,13 +316,7 @@ export default {
                 }
                 // 开启屏幕常亮
                 uni.setKeepScreenOn({
-                    keepScreenOn: true,
-                    success: function () {
-                        console.log('设置屏幕常亮成功');
-                    },
-                    fail: function (error) {
-                        console.error('设置屏幕常亮失败:', error);
-                    }
+                    keepScreenOn: true
                 });
             }
             this.updateSessionMessage();
@@ -584,7 +608,25 @@ export default {
         },
 
         showTaskOptions(index) {
-            // 原来的逻辑
+            this.currentEditingTaskIndex = index;
+            this.showTaskActionSheet = true;
+        },
+
+        handleTaskAction(actionData) {
+            this.showTaskActionSheet = false;
+            const actionIndex = actionData.indexs[0]; // 从对象中提取索引
+            console.log('actionIndex:', actionIndex);
+            if (actionIndex === 0) {
+                // 编辑任务
+                this.editTask(this.currentEditingTaskIndex);
+            } else if (actionIndex === 1) {
+                // 显示打扰历史
+                this.showDisturbanceHistoryForTask(this.currentEditingTaskIndex);
+            }
+        },
+
+        editTask(index) {
+            // 原有的编辑任务逻辑
             this.editingTaskIndex = index;
             const task = this.tasks[index];
             this.newTaskName = task.title;
@@ -593,6 +635,21 @@ export default {
             this.showAddTaskModal = true;
         },
 
+        showDisturbanceHistoryForTask(index) {
+            const task = this.tasks[index];
+            this.currentTaskDisturbanceHistory = this.pauseHistory.filter(item => item.taskIndex === index);
+            this.showDisturbanceHistory = true;
+        },
+
+        closeDisturbanceHistory() {
+            this.showDisturbanceHistory = false;
+            this.currentTaskDisturbanceHistory = [];
+        },
+
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        },
 
         updateTimerStatus() {
             // 计算预计完成时间和剩余时间
@@ -749,6 +806,88 @@ export default {
                 console.error('音频加载错误:', res.errMsg);
             });
         },
+        closePauseReasonModal() {
+            this.showPauseReasonModal = false;
+            this.pauseReason = '';
+            this.toggleTimer(); // 恢复计时器
+        },
+
+        recordPauseReason() {
+            if (this.pauseReason && this.pauseReason.trim() !== '') {
+                const pauseEvent = {
+                    taskIndex: this.currentTaskIndex,
+                    timestamp: new Date().toISOString(),
+                    reason: this.pauseReason
+                };
+                this.pauseHistory.push(pauseEvent);
+                this.savePauseHistory();
+            }
+            this.closePauseReasonModal();
+        },
+
+        savePauseHistory() {
+			console.log(this.pauseHistory)
+            uni.setStorage({
+                key: 'pauseHistory',
+                data: JSON.stringify(this.pauseHistory),
+                success: () => {
+                    console.log('暂停历史已保存到本地存储');
+                },
+                fail: (err) => {
+                    console.error('保存暂停历史失败:', err);
+                }
+            });
+        },
+
+        loadPauseHistory() {
+            uni.getStorage({
+                key: 'pauseHistory',
+                success: (res) => {
+                    try {
+                        this.pauseHistory = JSON.parse(res.data) || [];
+                    } catch (error) {
+                        console.error('解析暂停历史数据时出错:', error);
+                        this.pauseHistory = [];
+                    }
+                },
+                fail: (err) => {
+                    console.error('加载暂停历史失败:', err);
+                    this.pauseHistory = [];
+                }
+            });
+        },
+
+        deleteDisturbanceHistory(index) {
+            console.log('deleteDisturbanceHistory:', index)
+            // 从当前任务的打扰历史中删除
+            // 从 pauseHistory 中删除当前选择项
+            this.pauseHistory = this.pauseHistory.filter((item, idx) => idx !== index);
+            console.log('pauseHistory:', this.pauseHistory)
+            // 更新当前任务的打扰历史
+            this.currentTaskDisturbanceHistory = this.pauseHistory.filter(item => item.taskIndex === this.currentTaskIndex);
+            console.log('currentTaskDisturbanceHistory:', this.currentTaskDisturbanceHistory)
+            // 更新全局的 pauseHistory
+            this.pauseHistory = this.pauseHistory.filter((item, idx) => {
+                return !(item.taskIndex === this.currentTaskIndex && idx === index);
+            });
+            console.log('pauseHistory:', this.pauseHistory)
+
+            // 保存更新后的打扰历史到本地存储
+            this.savePauseHistory();
+
+            this.$u.toast('打扰历史已删除');
+        },
+        convertToTask(item) {
+            const newTask = {
+                id: Date.now(), // 简单的唯一ID生成方式
+                title: item.reason,
+                completed: false,
+                completedCount: 0,
+                totalCount: 1,
+                note: '',
+            };
+            this.tasks.push(newTask);
+        },
     },
     async mounted() {
         this.updateTheme();
@@ -761,6 +900,7 @@ export default {
         console.log('mounted 钩子中的任务:', this.tasks);
         await this.initBackgroundMusic(); // 在组件挂载时初始化背景音乐
         this.preloadAudio();
+        this.loadPauseHistory();
     },
     watch: {
         tasks: {
