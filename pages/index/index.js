@@ -64,6 +64,7 @@ export default {
             currentEditingTaskIndex: null,
             showDisturbanceHistory: false,
             currentTaskDisturbanceHistory: [],
+            isPc: false,
 
         }
     },
@@ -296,11 +297,11 @@ export default {
                     this.pauseBackgroundMusic();
                 }
                 // 检查是否支持 setKeepScreenOn
-            if (typeof uni.setKeepScreenOn === 'function') {
-                uni.setKeepScreenOn({
-                    keepScreenOn: false
-                });
-            }
+                if (typeof uni.setKeepScreenOn === 'function') {
+                    uni.setKeepScreenOn({
+                        keepScreenOn: false
+                    });
+                }
             } else {
                 this.setCurrentTask();
                 this.timer = setInterval(() => {
@@ -826,7 +827,7 @@ export default {
         },
 
         savePauseHistory() {
-			console.log(this.pauseHistory)
+            console.log(this.pauseHistory)
             uni.setStorage({
                 key: 'pauseHistory',
                 data: JSON.stringify(this.pauseHistory),
@@ -888,6 +889,15 @@ export default {
             };
             this.tasks.push(newTask);
         },
+        checkIsPc() {
+            // 使用 uni.getSystemInfo 来获取设备信息
+            uni.getSystemInfo({
+                success: (res) => {
+                    // 如果平台是 'windows' 或 'mac'，则认为是 PC
+                    this.isPc = ['windows', 'mac'].includes(res.platform);
+                }
+            });
+        }
     },
     async mounted() {
         this.updateTheme();
@@ -901,6 +911,7 @@ export default {
         await this.initBackgroundMusic(); // 在组件挂载时初始化背景音乐
         this.preloadAudio();
         this.loadPauseHistory();
+        this.checkIsPc();
     },
     watch: {
         tasks: {

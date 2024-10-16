@@ -367,8 +367,15 @@
       </view>
     </u-popup>
 
+    <!-- 新增：PC端备案信息 -->
+    <view class="footer" v-if="isPc">
+      <view class="footer-content">
+        <text>技术支持：适度应用</text>
+        <text class="separator">|</text>
+        <a href="https://beian.miit.gov.cn" target="_blank" class="beian-link">粤ICP备2024321013号-1</a>
+      </view>
+    </view>
   </view>
-
 </template>
 <script src="./index.js"></script>
 

@@ -709,3 +709,41 @@ body,
     padding: 40rpx 0;
   }
 }
+
+// 在文件末尾添加以下样式
+
+.footer {
+  width: 100%;
+  padding: 20rpx 0;
+  
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    text, a {
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 24rpx;
+    }
+    
+    .separator {
+      margin: 0 10rpx;
+    }
+    
+    .beian-link {
+      text-decoration: none;
+    }
+  }
+}
+
+// 确保页脚始终在底部
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-container {
+  flex: 1;
+}
